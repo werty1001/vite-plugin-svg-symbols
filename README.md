@@ -16,7 +16,7 @@
 * [Options](#options)
 
 <p align="center">
-  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
 
 ## Getting Started
@@ -42,17 +42,17 @@ export default defineConfig({
   },
 });
 ```
-**3.** Add to your `env.d.ts` (*optional, only if you want to use [mass import](#mass-import)*):
+**3.** Add to your `env.d.ts`:
 ```html
-/// <reference types="vite-plugin-svg-symbols" />
+/// <reference types="vite-plugin-svg-symbols/client" />
 ```
 
 <p align="center">
-  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
 
 ## Usage
-For example, you have `src/icons/cat.svg` and `src/icons/dog.svg` and alias **@icons** in `vite.config.ts`
+For example, you have `src/icons/cat.svg` and `src/icons/dog.svg` and **@icons** alias in `vite.config.ts`
 
 #### Single import
 ```js
@@ -61,13 +61,18 @@ import icon from '@icons/dog.svg?symbol'; // import icon as symbol href
 
 #### Mass import
 ```js
-import icons from 'symbols:dog,cat'; // import two icons from @icons alias
-// { dog: '...', cat: '...'  }
+import icons from 'symbols:dog,cat'; // import two icons as symbol hrefs
+// { dog: '...', cat: '...' }
+```
+By default, icons are loaded from the **@icons** alias:
+```js
+'symbols:dog,cat' = 'symbols@icons:dog,cat'
 ```
 
 #### Icon packages
 You can add alias for library, for example **@lucide** ([lucide](https://www.npmjs.com/package/lucide-static)):
 ```js
+// vite.config.ts
 alias: {
   '@lucide': fileURLToPath(new URL('./node_modules/lucide-static/icons/', import.meta.url)),
 },
@@ -78,15 +83,22 @@ import icon from '@lucide/banana.svg?symbol';
 ```
 ```js
 import icons from 'symbols@lucide:apple,banana';
-// { apple: '...', banana: '...'  }
+// { apple: '...', banana: '...' }
 ```
 
+#### All import
+```js
+import icons from 'symbols:*'; // import all svg from the @icons alias
+// { dog: '...', cat: '...', and another }
+```
+> ⚠️ Use a wildcard import only if you have few icons; otherwise, import them individually by name
+
 <p align="center">
-  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
 
 ## Examples
-When you have `src/icons/cat.svg` and `src/icons/dog.svg` and alias **@icons** in `vite.config.ts`
+When you have `src/icons/cat.svg` and `src/icons/dog.svg` and **@icons** alias in `vite.config.ts`
 > [Vue](#vue) / [React](#react) / [Svelte](#svelte)
 
 ### Vue
@@ -105,9 +117,12 @@ import dogSymbol from '@icons/dog.svg?symbol';
     <use href="@icons/cat.svg?symbol" /> // or import icon directly
   </svg>
 
+  <!-- Don't do this -->
   <svg aria-hidden="true">
-    <use :href="`@icons/${name}.svg?symbol`" /> // ⚠️ dynamic href not working
+    <use :href="'@icons/cat.svg?symbol'" /> // ⚠️ dynamic path not working
   </svg>
+  <!-- :( -->
+
 </template>
 ```
 Mass import:
