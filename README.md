@@ -6,6 +6,7 @@
 ### Features
 * Create a single sprite from SVG files
 * Use a sprite as a static file for JS bundle optimization
+* The production build includes only the icons that are actually used
 * Support mass import or by one
 * Compatible with modern frameworks: [Vue](#vue) / [React](#react) / [Svelte](#svelte)
 
@@ -54,19 +55,18 @@ export default defineConfig({
 ## Usage
 For example, you have `src/icons/cat.svg` and `src/icons/dog.svg` and **@icons** alias in `vite.config.ts`
 
-#### Single import
+#### Plain import
 ```js
-import icon from '@icons/dog.svg?symbol'; // import icon as symbol href
+import dogIcon from '@icons/dog.svg?symbol'; // import icon as symbol href
 ```
 
 #### Mass import
 ```js
-import icons from 'symbols:dog,cat'; // import two icons as symbol hrefs
-// { dog: '...', cat: '...' }
+import { dogIcon, catIcon } from 'svg:symbols'; // import two icons as symbol hrefs
 ```
 By default, icons are loaded from the **@icons** alias:
 ```js
-'symbols:dog,cat' = 'symbols@icons:dog,cat'
+'svg:symbols' = 'svg:symbols@icons'
 ```
 
 #### Icon packages
@@ -79,19 +79,23 @@ alias: {
 ```
 Then import icons from **lucide** package:
 ```js
-import icon from '@lucide/banana.svg?symbol';
+import bananaIcon from '@lucide/banana.svg?symbol';
 ```
 ```js
-import icons from 'symbols@lucide:apple,banana';
-// { apple: '...', banana: '...' }
+import { appleIcon, bananaIcon } from 'svg:symbols@lucide';
 ```
 
-#### All import
+#### Import names
+By default, icon names are defined in camel case with the `Icon` suffix:
 ```js
-import icons from 'symbols:*'; // import all svg from the @icons alias
-// { dog: '...', cat: '...', and another }
+banana.svg → bananaIcon
+a-arrow-up.svg → aArrowUpIcon
+arrow-down-a-z.svg → arrowDownAZIcon
+arrow-down-1-0.svg → arrowDown10Icon
+
+// subdir
+home/foo.svg → homeFooIcon
 ```
-> ⚠️ Use a wildcard import only if you have few icons; otherwise, import them individually by name
 
 <p align="center">
   <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
@@ -102,15 +106,15 @@ When you have `src/icons/cat.svg` and `src/icons/dog.svg` and **@icons** alias i
 > [Vue](#vue) / [React](#react) / [Svelte](#svelte)
 
 ### Vue
-Single import:
+Plain import:
 ```vue
 <script setup lang="ts">
-import dogSymbol from '@icons/dog.svg?symbol';
+import dogIcon from '@icons/dog.svg?symbol';
 </script>
 
 <template>
   <svg aria-hidden="true">
-    <use :href="dogSymbol" /> // use dogSymbol from script
+    <use :href="dogIcon" /> // use dogIcon from script
   </svg>
 
   <svg aria-hidden="true">
@@ -128,16 +132,16 @@ import dogSymbol from '@icons/dog.svg?symbol';
 Mass import:
 ```vue
 <script setup lang="ts">
-import icons from 'symbols:dog,cat'; // import two icons from @icons
+import { dogIcon, catIcon } from 'svg:symbols'; // import two icons from @icons
 </script>
 
 <template>
   <svg aria-hidden="true">
-    <use :href="icons.dog" />
+    <use :href="dogIcon" />
   </svg>
 
   <svg aria-hidden="true">
-    <use :href="icons.cat" />
+    <use :href="catIcon" />
   </svg>
 </template>
 ```
@@ -155,13 +159,13 @@ defineProps<{ src: string }>()
 ```
 ```vue
 <script setup lang="ts">
-import icons from 'symbols:dog,cat'; // import two icons from @icons
+import { dogIcon, catIcon } from 'svg:symbols'; // import two icons from @icons
 import BaseIcon from '@/components/BaseIcon.vue';
 </script>
 
 <template>
-  <BaseIcon :src="icons.dog" />
-  <BaseIcon :src="icons.cat" />
+  <BaseIcon :src="dogIcon" />
+  <BaseIcon :src="catIcon" />
 </template>
 ```
 
@@ -180,3 +184,161 @@ soon
 </p>
 
 ## Options
+* Inject: [shouldInjectToHtml](#shouldinjecttohtml) | [injectAttrs](#injectattrs)
+* Transform: [Icon](#transformicon) | [IconId](#transformiconid) | [Sprite](#transformsprite) | [Symbol](#transformsymbol) | [ImportName](#transformimportname) | [ImportComment](#transformimportcomment)
+```ts
+type SvgSymbolsPluginOptions = {
+  fileName?: string
+  shouldInjectToHtml?: boolean
+  injectAttrs?: Record<string, string | boolean | undefined>
+  transformIcon?: (iconCode: string, iconPath: string) => string | Promise<string>
+  transformIconId?: (iconId: string, iconPath: string) => string | Promise<string>
+  transformSprite?: (body: string) => string | Promise<string>
+  transformImportName?: (name: string, iconPath: string) => string | Promise<string>
+  transformImportComment?: (comment: string, iconPath: string) => string | Promise<string>
+  transformSymbol?: (symbolCode: string, payload: {
+    id: string
+    svgBody: string
+    svgPath: string
+    svgAttrs: Record<string, string>
+  }) => string | Promise<string>
+}
+```
+#### fileName
+```js
+{
+  fileName: 'my-sprite-name-[hash]', // default 'sprite-[hash]'
+}
+```
+
+#### shouldInjectToHtml
+```js
+{
+  shouldInjectToHtml: true, // When set to true, injects the sprite into index.html
+}
+```
+
+#### injectAttrs
+```js
+{
+  injectAttrs: { ... }, // Defines sprite attributes when injected into index.html
+
+  // default:
+  // {
+  //  'aria-hidden': 'true',
+  //   style: 'position:absolute;top:0;left:0;width:1px;height:1px;visibility:hidden;opacity:0;',
+  // }
+}
+```
+
+#### transformIcon
+```js
+// Callback function to transform an icon body, for example, to optimize it with svgo:
+
+const { optimize } = require('svgo');
+const svgoOptions = {
+  plugins: [
+    {
+      name: 'preset-default',
+      params: {
+        overrides: {
+          removeComments: true,
+        },
+      },
+    },
+  ],
+};
+```
+```js
+{
+  transformIcon: (iconCode, iconPath) => {
+    const optimizationResult = optimize(iconCode, svgoOptions);
+    return optimizationResult.data;
+  },
+}
+```
+
+#### transformIconId
+```js
+// Callback function to transform an icon id, for example, when you have:
+// src/icons/cat.svg
+{
+  transformIconId: (iconId, iconPath) => {
+    console.log(iconId); // 'icons-cat'
+    console.log(iconPath); // '/Users/werty1001/Desktop/app/src/icons/cat.svg'
+    return iconId;
+  },
+}
+```
+
+#### transformSprite
+```js
+// Callback function to transform the sprite body, for example, to prepend <defs>:
+{
+  transformSprite: (body) => {
+    return '<defs>...</defs>'.concat(body);
+  },
+}
+```
+
+#### transformSymbol
+```js
+// Callback function to transform the sprite symbol, for example, when you have:
+// src/icons/cat.svg
+{
+  transformSymbol: (symbolCode, payload) => {
+    console.log(symbolCode); // '...'
+    console.log(payload);
+    // {
+    //   id: 'icons-cat',
+    //   svgBody: '...',
+    //   svgPath: '/Users/werty1001/Desktop/app/src/icons/cat.svg',
+    //   svgAttrs: { viewBox: '0 0 24 24', ... }
+    // }
+    return symbolCode;
+  },
+}
+```
+
+#### transformImportName
+```js
+// Callback function to transform import name, for example, when you have:
+// src/icons/cat.svg
+{
+  transformImportName: (name, iconPath) => {
+    console.log(name); // 'catIcon'
+    console.log(iconPath); // '/Users/werty1001/Desktop/app/src/icons/cat.svg'
+    return name;
+  },
+}
+// import { catIcon } from 'svg:symbols';
+```
+
+#### transformImportComment
+```js
+// Callback function to transform import comment, for example, when you have lucide package:
+
+import { basename } from 'path';
+
+const lucideComment = `/**
+ * Lucide
+ * @see https://lucide.dev/icons/[name]
+ */`;
+```
+```js
+{
+  // Replace the default comment to enable IDEs to show
+  // tooltips with a link to the icon at https://lucide.dev
+
+  transformImportComment: (comment, iconPath) => {
+    if (iconPath.includes('node_modules/lucide-static')) {
+      return lucideComment.replace('[name]', basename(iconPath, '.svg'));
+    }
+    return comment;
+  },
+}
+```
+
+<p align="center">
+  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+</p>
