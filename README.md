@@ -62,11 +62,7 @@ import dogIcon from '@icons/dog.svg?symbol'; // import icon as symbol href
 
 #### Mass import
 ```js
-import { dogIcon, catIcon } from 'svg:symbols'; // import two icons as symbol hrefs
-```
-By default, icons are loaded from the **@icons** alias:
-```js
-'svg:symbols' = 'svg:symbols@icons'
+import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons as symbol hrefs
 ```
 
 #### Icon packages
@@ -132,7 +128,7 @@ import dogIcon from '@icons/dog.svg?symbol';
 Mass import:
 ```vue
 <script setup lang="ts">
-import { dogIcon, catIcon } from 'svg:symbols'; // import two icons from @icons
+import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
 </script>
 
 <template>
@@ -159,7 +155,7 @@ defineProps<{ src: string }>()
 ```
 ```vue
 <script setup lang="ts">
-import { dogIcon, catIcon } from 'svg:symbols'; // import two icons from @icons
+import { dogIcon, catIcon } from 'svg:symbols@icons';
 import BaseIcon from '@/components/BaseIcon.vue';
 </script>
 
@@ -180,7 +176,7 @@ soon
 ```
 
 <p align="center">
-  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
 
 ## Options
@@ -311,7 +307,7 @@ const svgoOptions = {
     return name;
   },
 }
-// import { catIcon } from 'svg:symbols';
+// import { catIcon } from 'svg:symbols@icons';
 ```
 
 #### transformImportComment
@@ -331,7 +327,7 @@ const lucideComment = `/**
   // tooltips with a link to the icon at https://lucide.dev
 
   transformImportComment: (comment, iconPath) => {
-    if (iconPath.includes('node_modules/lucide-static')) {
+    if (iconPath.includes('lucide-static')) {
       return lucideComment.replace('[name]', basename(iconPath, '.svg'));
     }
     return comment;
@@ -340,5 +336,5 @@ const lucideComment = `/**
 ```
 
 <p align="center">
-  <a href="#navigation"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
