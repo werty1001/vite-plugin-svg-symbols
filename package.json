@@ -54,6 +54,7 @@
     "vue",
     "react",
     "svelte",
-    "angular"
+    "solid",
+    "preact"
   ]
 }
