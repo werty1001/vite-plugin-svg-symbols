@@ -165,14 +165,127 @@ import BaseIcon from '@/components/BaseIcon.vue';
 </template>
 ```
 
+<p align="center">
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+</p>
+
 ### React
+Plain import:
+```tsx
+import dogIcon from '@icons/dog.svg?symbol';
+
+function App() {
+  return (
+    <>
+      <svg aria-hidden="true">
+        <use href={dogIcon} />
+      </svg>
+    </>
+  )
+}
+
+export default App
 ```
-soon
+Mass import:
+```tsx
+import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
+
+function App() {
+  return (
+    <>
+      <svg aria-hidden="true">
+        <use href={dogIcon} />
+      </svg>
+
+      <svg aria-hidden="true">
+        <use href={catIcon} />
+      </svg>      
+    </>
+  )
+}
+
+export default App
+```
+You can create a very simple component **BaseIcon.tsx**:
+```tsx
+function BaseIcon({ src = '' }) {
+  return (
+    <svg aria-hidden="true">
+      <use href={src} />
+    </svg>
+  )
+}
+export default BaseIcon
+```
+```tsx
+import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
+import BaseIcon from './BaseIcon'
+
+function App() {
+  return (
+    <>      
+      <BaseIcon src={dogIcon} />
+      <BaseIcon src={catIcon} />
+    </>
+  )
+}
+
+export default App
 ```
 
+<p align="center">
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+</p>
+
 ### Svelte
+Plain import:
+```svelte
+<script lang="ts">
+import dogIcon from '@icons/dog.svg?symbol';
+</script>
+
+<main>
+  <svg aria-hidden="true">
+    <use href={dogIcon} />
+  </svg>
+</main>
 ```
-soon
+Mass import:
+```svelte
+<script lang="ts">
+import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
+</script>
+
+<main>
+  <svg aria-hidden="true">
+    <use href={dogIcon} />
+  </svg>
+
+  <svg aria-hidden="true">
+    <use href={catIcon} />
+  </svg>
+</main>
+```
+You can create a very simple component **BaseIcon.svelte**:
+```svelte
+<script lang="ts">
+  export let src = '';
+</script>
+
+<svg aria-hidden="true">
+  <use href={src} />
+</svg>
+```
+```svelte
+<script lang="ts">
+import { dogIcon, catIcon } from 'svg:symbols@icons';
+import BaseIcon from './BaseIcon.svelte';
+</script>
+
+<main>
+  <BaseIcon src={dogIcon} />
+  <BaseIcon src={catIcon} />
+</main>
 ```
 
 <p align="center">
@@ -183,6 +296,15 @@ soon
 * Inject: [shouldInjectToHtml](#shouldinjecttohtml) | [injectAttrs](#injectattrs)
 * Transform: [Icon](#transformicon) | [IconId](#transformiconid) | [Sprite](#transformsprite) | [Symbol](#transformsymbol) | [ImportName](#transformimportname) | [ImportComment](#transformimportcomment)
 ```ts
+type SymbolPayload = {
+  symbolId: string
+  symbolBody: string
+  symbolViewBox: string
+  svgBody: string
+  svgPath: string
+  svgAttrs: Record<string, string>
+}
+
 type SvgSymbolsPluginOptions = {
   fileName?: string
   shouldInjectToHtml?: boolean
@@ -190,14 +312,9 @@ type SvgSymbolsPluginOptions = {
   transformIcon?: (iconCode: string, iconPath: string) => string | Promise<string>
   transformIconId?: (iconId: string, iconPath: string) => string | Promise<string>
   transformSprite?: (body: string) => string | Promise<string>
+  transformSymbol?: (symbolCode: string, payload: SymbolPayload) => string | Promise<string>
   transformImportName?: (name: string, iconPath: string) => string | Promise<string>
   transformImportComment?: (comment: string, iconPath: string) => string | Promise<string>
-  transformSymbol?: (symbolCode: string, payload: {
-    id: string
-    svgBody: string
-    svgPath: string
-    svgAttrs: Record<string, string>
-  }) => string | Promise<string>
 }
 ```
 #### fileName
@@ -205,6 +322,36 @@ type SvgSymbolsPluginOptions = {
 {
   fileName: 'my-sprite-name-[hash]', // default 'sprite-[hash]'
 }
+```
+
+#### shouldInheritAttrs
+```js
+{
+  shouldInheritAttrs: [], // List of SVG attributes to inherit in <symbol>
+}
+// default: [
+//   'fill',
+//   'stroke',
+//   'stroke-dasharray',
+//   'stroke-dashoffset',
+//   'stroke-linecap',
+//   'stroke-linejoin',
+//   'stroke-miterlimit',
+//   'stroke-opacity',
+//   'stroke-width',
+// ];
+```
+```html
+<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+  <circle cx="8" cy="8" r="8"></circle>
+</svg>
+
+<!-- Become -->
+<symbol viewBox="0 0 16 16" id="some-id">
+  <g fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="8" cy="8" r="8"></circle>
+  </g>
+</symbol>
 ```
 
 #### shouldInjectToHtml
@@ -218,13 +365,12 @@ type SvgSymbolsPluginOptions = {
 ```js
 {
   injectAttrs: { ... }, // Defines sprite attributes when injected into index.html
-
-  // default:
-  // {
-  //  'aria-hidden': 'true',
-  //   style: 'position:absolute;top:0;left:0;width:1px;height:1px;visibility:hidden;opacity:0;',
-  // }
 }
+// default:
+// {
+//  'aria-hidden': 'true',
+//   style: 'position:absolute;top:0;left:0;width:1px;height:1px;visibility:hidden;opacity:0;',
+// }
 ```
 
 #### transformIcon
@@ -283,11 +429,13 @@ const svgoOptions = {
 // src/icons/cat.svg
 {
   transformSymbol: (symbolCode, payload) => {
-    console.log(symbolCode); // '...'
+    console.log(symbolCode); // '<symbol ...'
     console.log(payload);
     // {
-    //   id: 'icons-cat',
-    //   svgBody: '...',
+    //   symbolId: 'icons-cat',
+    //   symbolBody: '<path ...',
+    //   symbolViewBox: '0 0 24 24',
+    //   svgBody: '<path ...',
     //   svgPath: '/Users/werty1001/Desktop/app/src/icons/cat.svg',
     //   svgAttrs: { viewBox: '0 0 24 24', ... }
     // }
@@ -312,7 +460,8 @@ const svgoOptions = {
 
 #### transformImportComment
 ```js
-// Callback function to transform import comment, for example, when you have lucide package:
+// Callback function to transform import comment,
+// for example, when you have lucide package:
 
 import { basename } from 'path';
 
