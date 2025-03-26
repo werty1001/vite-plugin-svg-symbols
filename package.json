@@ -1,0 +1,59 @@
+{
+  "name": "vite-plugin-svg-symbols",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Vite plugin for creating SVG symbol sprite",
+  "author": "Oleg Krylov <hey@oleg-krylov.ru>",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./client": {
+      "types": "./client.d.ts"
+    }
+  },
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "build": "tsc && vite build",
+    "build:app:inject": "tsc && vite build --mode plugintest --config test.inject.ts",
+    "build:app:single": "tsc && vite build --mode plugintest --config test.single.ts",
+    "build:apps": "npm run build:app:inject & npm run build:app:single",
+    "test": "npm run build:apps && vitest run"
+  },
+  "homepage": "https://github.com/werty1001/vite-plugin-svg-symbols",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/werty1001/vite-plugin-svg-symbols.git"
+  },
+  "bugs": {
+    "url": "https://github.com/werty1001/vite-plugin-svg-symbols/issues"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.13",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "vite-plugin-static-copy": "^2.3.0",
+    "vitest": "^3.0.9"
+  },
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "svg-sprite",
+    "svg-symbol",
+    "svg",
+    "sprite",
+    "symbol",
+    "svgo",
+    "vue",
+    "react",
+    "svelte",
+    "angular"
+  ]
+}
