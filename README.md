@@ -43,7 +43,7 @@ export default defineConfig({
   },
 });
 ```
-**3.** Add to your `env.d.ts`:
+**3.** Add to your `vite-env.d.ts`:
 ```html
 /// <reference types="vite-plugin-svg-symbols/client" />
 ```
