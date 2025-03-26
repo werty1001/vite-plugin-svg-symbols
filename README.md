@@ -8,7 +8,7 @@
 * Use a sprite as a static file for JS bundle optimization
 * The production build includes only the icons that are actually used
 * Support mass import or by one
-* Compatible with modern frameworks: [Vue](#vue) / [React](#react) / [Svelte](#svelte)
+* Compatible with modern frameworks: [Vue](#vue) / [Svelte](#svelte) / [React](#react--solid--preact) / [Solid](#react--solid--preact) / [Preact](#react--solid--preact)
 
 ### Navigation
 * [Getting Started](#getting-started)
@@ -99,7 +99,7 @@ home/foo.svg → homeFooIcon
 
 ## Examples
 When you have `src/icons/cat.svg` and `src/icons/dog.svg` and **@icons** alias in `vite.config.ts`
-> [Vue](#vue) / [React](#react) / [Svelte](#svelte)
+>  [Vue](#vue) / [Svelte](#svelte) / [React](#react--solid--preact) / [Solid](#react--solid--preact) / [Preact](#react--solid--preact)
 
 ### Vue
 Plain import:
@@ -169,74 +169,6 @@ import BaseIcon from '@/components/BaseIcon.vue';
   <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
 
-### React
-Plain import:
-```tsx
-import dogIcon from '@icons/dog.svg?symbol';
-
-function App() {
-  return (
-    <>
-      <svg aria-hidden="true">
-        <use href={dogIcon} />
-      </svg>
-    </>
-  )
-}
-
-export default App
-```
-Mass import:
-```tsx
-import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
-
-function App() {
-  return (
-    <>
-      <svg aria-hidden="true">
-        <use href={dogIcon} />
-      </svg>
-
-      <svg aria-hidden="true">
-        <use href={catIcon} />
-      </svg>      
-    </>
-  )
-}
-
-export default App
-```
-You can create a very simple component **BaseIcon.tsx**:
-```tsx
-function BaseIcon({ src = '' }) {
-  return (
-    <svg aria-hidden="true">
-      <use href={src} />
-    </svg>
-  )
-}
-export default BaseIcon
-```
-```tsx
-import { dogIcon, catIcon } from 'svg:symbols@icons'; // import two icons
-import BaseIcon from './BaseIcon'
-
-function App() {
-  return (
-    <>      
-      <BaseIcon src={dogIcon} />
-      <BaseIcon src={catIcon} />
-    </>
-  )
-}
-
-export default App
-```
-
-<p align="center">
-  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
-</p>
-
 ### Svelte
 Plain import:
 ```svelte
@@ -286,6 +218,74 @@ import BaseIcon from './BaseIcon.svelte';
   <BaseIcon src={dogIcon} />
   <BaseIcon src={catIcon} />
 </main>
+```
+
+<p align="center">
+  <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
+</p>
+
+### React & Solid & Preact
+Plain import:
+```tsx
+import dogIcon from '@icons/dog.svg?symbol'
+
+function App() {
+  return (
+    <>
+      <svg aria-hidden="true">
+        <use href={dogIcon} />
+      </svg>
+    </>
+  )
+}
+
+export default App
+```
+Mass import:
+```tsx
+import { dogIcon, catIcon } from 'svg:symbols@icons' // import two icons
+
+function App() {
+  return (
+    <>
+      <svg aria-hidden="true">
+        <use href={dogIcon} />
+      </svg>
+
+      <svg aria-hidden="true">
+        <use href={catIcon} />
+      </svg>      
+    </>
+  )
+}
+
+export default App
+```
+You can create a very simple component **BaseIcon.tsx**:
+```tsx
+function BaseIcon({ src = '' }) {
+  return (
+    <svg aria-hidden="true">
+      <use href={src} />
+    </svg>
+  )
+}
+export default BaseIcon
+```
+```tsx
+import { dogIcon, catIcon } from 'svg:symbols@icons' // import two icons
+import BaseIcon from './BaseIcon'
+
+function App() {
+  return (
+    <>      
+      <BaseIcon src={dogIcon} />
+      <BaseIcon src={catIcon} />
+    </>
+  )
+}
+
+export default App
 ```
 
 <p align="center">
