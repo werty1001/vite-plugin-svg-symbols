@@ -48,6 +48,16 @@ export default defineConfig({
 /// <reference types="vite-plugin-svg-symbols/client" />
 ```
 
+### ⚠️ Icon types are generated dynamically at build time, to avoid error:
+> error TS2614: Module 'svg:symbols@icons' has no exported member ...
+
+Type checking must be run **after** the build in `package.json`:
+```json
+"scripts": {
+  "build": "vite build && tsc -b",
+},
+```
+
 <p align="center">
   <a href="#vite-plugin-svg-symbols"><img align="center" src="https://werty1001.github.io/sep.svg" alt=""></a>
 </p>
