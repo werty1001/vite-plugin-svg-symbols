@@ -124,18 +124,25 @@ export default (options?: SvgSymbolsPluginOptions): Plugin => {
 
     const icons = await getDirContent(aliasPath);
     const types: [string, string, string][] = [];
+    const namesMap = new Map<string, number>();
 
     let code = '';
     let ids = '';
 
     for (const src of icons) {
-      const [name, href] = await Promise.all([
+      const [generatedName, href] = await Promise.all([
         transformImportName(generateImportName(aliasPath, src), src),
         addFileToSprite(src),
       ]);
+
+      const nameCount = namesMap.get(generatedName) || 0;
+      const name = generatedName.concat(nameCount > 0 ? String(nameCount + 1) : '');
+
       code += `export const ${name} = '${href}';\n`;
       ids += `${name}, `;
+
       types.push([src, name, href]);
+      namesMap.set(generatedName, nameCount + 1);
     }
 
     modules.set(alias, types);

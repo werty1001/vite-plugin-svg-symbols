@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-svg-symbols",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Vite plugin for creating SVG symbol sprite",
   "author": "Oleg Krylov <hey@oleg-krylov.ru>",
   "license": "MIT",
@@ -18,11 +18,16 @@
   "module": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "npm run build:plugin && npm run build:bin",
+    "build:plugin": "tsc && vite build",
+    "build:bin": "tsc && vite build --config bin.config.ts",
     "build:app:inject": "tsc && vite build --mode plugintest --config test.inject.ts",
     "build:app:single": "tsc && vite build --mode plugintest --config test.single.ts",
     "build:apps": "npm run build:app:inject & npm run build:app:single",
     "test": "npm run build:apps && vitest run"
+  },
+  "bin": {
+    "vpss": "./bin.js"
   },
   "homepage": "https://github.com/werty1001/vite-plugin-svg-symbols",
   "repository": {
