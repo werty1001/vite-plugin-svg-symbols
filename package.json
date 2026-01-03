@@ -24,7 +24,8 @@
     "build:app:inject": "tsc && vite build --mode plugintest --config test.inject.ts",
     "build:app:single": "tsc && vite build --mode plugintest --config test.single.ts",
     "build:apps": "npm run build:app:inject & npm run build:app:single",
-    "test": "npm run build:apps && vitest run"
+    "restore:client": "cp client.d.ts app/client.d.ts",
+    "test": "npm run build:apps && vitest run && npm run restore:client"
   },
   "bin": {
     "vpss": "./bin.js"
