@@ -101,6 +101,10 @@ arrow-down-1-0.svg → arrowDown10Icon
 
 // subdir
 home/foo.svg → homeFooIcon
+
+// when same names
+arrow-down-0-1.svg → arrowDown01Icon
+arrow-down-01.svg  → arrowDown01Icon2 (because arrowDown01Icon already exist)
 ```
 
 <p align="center">
