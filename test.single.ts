@@ -1,7 +1,6 @@
 
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import useSvgSymbols from './src/index';
 import type { SvgSymbolsPluginOptions } from './index';
 
@@ -19,11 +18,6 @@ const options: SvgSymbolsPluginOptions = {
 export default defineConfig({
   plugins: [
     useSvgSymbols(options),
-    viteStaticCopy({
-      targets: [
-        { src: './client.d.ts', dest: '../../app' },
-      ],
-    }),
   ],
   resolve: {
     alias: {
