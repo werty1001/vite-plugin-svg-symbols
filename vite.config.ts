@@ -27,6 +27,7 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
+        { src: './bin.js', dest: './' },
         { src: './index.d.ts', dest: './' },
         { src: './client.d.ts', dest: './' },
         { src: './README.md', dest: './' },
