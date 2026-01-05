@@ -37,7 +37,9 @@ import type { SvgSymbolsPluginOptions } from '../index.d';
 export const defaultInjectAttrs = INJECT_ATTRS;
 export const defaultInheritAttrs = INHERIT_SVG_ATTRS;
 
-export default (options?: SvgSymbolsPluginOptions): Plugin => {
+export default (options?: SvgSymbolsPluginOptions): Plugin<{
+  generateSymbolsTypes: () => Promise<void>
+}> => {
   const {
     fileName = 'sprite-[hash]',
     shouldInheritAttrs = defaultInheritAttrs,
@@ -313,5 +315,12 @@ export default (options?: SvgSymbolsPluginOptions): Plugin => {
       }
     },
 
+    api: {
+      async generateSymbolsTypes() {
+        const modulesNames = Object.keys(config.aliases).map((name) => name.replace('@', '')).filter(Boolean);
+        await Promise.all(modulesNames.map(createModule));
+        return updateTypes();
+      },
+    },
   };
 };

@@ -29,33 +29,47 @@ npm i vite-plugin-svg-symbols -D
 ```js
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
-import useSvgSymbols from 'vite-plugin-svg-symbols';
+import useSvgSymbols from 'vite-plugin-svg-symbols'; // ← [1] import plugin
 
 export default defineConfig({
   plugins: [
-    useSvgSymbols(), // add plugin
+    useSvgSymbols(), // ← [2] use plugin
   ],
   resolve: {
-    // Using aliases makes imports prettier
     alias: {
-      '@icons': fileURLToPath(new URL('./src/icons', import.meta.url)),
+      '@icons': fileURLToPath(new URL('./src/icons', import.meta.url)), // ← [3] add alias
     },
   },
 });
 ```
-**3.** Add to your `vite-env.d.ts`:
-```html
+**3.** Add to your `vite-env.d.ts` or `env.d.ts`:
+```ts
 /// <reference types="vite-plugin-svg-symbols/client" />
 ```
+> [!TIP]
+> If your project doesn't include an `env.d.ts` file, you can specify the type reference in `tsconfig.app.json`:
+> ```json
+> "compilerOptions": {
+>   "types": ["vite-plugin-svg-symbols/client"]
+> }
+> ```
 
-### ⚠️ Icon types are generated dynamically at build time, to avoid error:
-> error TS2614: Module 'svg:symbols@icons' has no exported member ...
-
-Type checking must be run **after** the build in `package.json`:
+**4.** Finally, add the `vpss` command **before** type checking in `package.json`:
+> [!IMPORTANT]
+> **The `vpss` command generates types for icons to avoid errors such as:**
+> 
+> `error TS2614: Module 'svg:symbols@icons' has no exported member ...`
 ```json
 "scripts": {
-  "build": "vite build && tsc -b",
-},
+  "build": "vpss && tsc -b && vite build"
+}
+```
+
+Another option is to run type checking **after** the build process; since types are generated during the build, no extra command is required:
+```json
+"scripts": {
+  "build": "vite build && tsc -b"
+}
 ```
 
 <p align="center">
